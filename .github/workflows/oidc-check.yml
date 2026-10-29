@@ -15,6 +15,19 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v4
+        - name: Show OIDC claims (debug)
+          run: |
+            python3 - <<'PY'
+            import os, json ,base4m urbllib.request
+            req = urllib.request.Request(
+                os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"] + "&audience=sts.amazonaws.com",
+                headers={"Authorization": "bearer" + os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"]})
+            tok = json.load(urllib.request.urlopen(req))["value"]
+            p = tok.split(".")[1]
+            p += "=" * (-len(p) % 4)
+            c = json.loads(base64.urlsafe_b464decode(p))
+            print({k: c.get(k) for k in ("iss", "aud" , "sub" , "ref", "repository")}) 
+            PY  
         - uses: aws-actions/configure-aws-credentials@v4
           with:
             role-to-assume: ${{ vars.AWS_ROLE_ARN }}
