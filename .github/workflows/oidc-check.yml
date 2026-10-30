@@ -18,7 +18,7 @@ jobs:
         - name: Show OIDC claims (debug)
           run: |
             python3 - <<'PY'
-            import os, json ,base4m urbllib.request
+            import os, json, base64, urllib.request
             req = urllib.request.Request(
                 os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"] + "&audience=sts.amazonaws.com",
                 headers={"Authorization": "bearer" + os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"]})
@@ -33,4 +33,3 @@ jobs:
             role-to-assume: ${{ vars.AWS_ROLE_ARN }}
             aws-region: us-east-1
         - run: aws sts get-caller-identity
-
